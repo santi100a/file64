@@ -2,13 +2,13 @@ import { Command } from "commander";
 import { textSync } from "figlet";
 import { promises as FSPromises, type PathLike } from "node:fs";
 
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.0.1';
 const CLI_NAME = 'File to Base64';
 const program = new Command()
 .version(VERSION)
 .description('Encodes a file in Base64 format.')
 .option('-p, --picture [image-type]', 'If the file is an image, specify image format. Default is JPEG.')
-.requiredOption('-f, --file <filename>', 'Filename to encode.')
+.argument('<filename> [output]', 'Filename to encode, and output file (default is stdout).')
 .parse(process.argv);
 
 console.clear();
@@ -24,7 +24,8 @@ async function read(filename: PathLike, encoding?: BufferEncoding): Promise<
     }
 }
 (async function () {
-    const [ file, error ] = await read(options.file, 'utf8');
+    const [ filename, output ] = program.args;
+    const [ file, error ] = await read(filename, 'utf8');
     
 
     if (error) {
@@ -43,6 +44,21 @@ async function read(filename: PathLike, encoding?: BufferEncoding): Promise<
         process.exit(0);
     }
     const base64 = Buffer.from(file).toString('base64');
+    if (output) {
+        async function writeFile(filename: PathLike, encoding?: BufferEncoding): Promise<Error | null> {
+            try {
+                await FSPromises.writeFile(filename, encoding || 'utf8');
+                return null;
+            } catch (err) {
+                return err as Error;
+            }
+        }
+        const err = await writeFile(filename.concat('-base64'));
+        if (err) {
+            console.log('\x1b[31m%s\x1b[0m', `✗ An error has ocurred while writing the file. ${error}.`);
+            process.exit(1);
+        }
+    }
 
     console.log('Encoded file is: %s', base64);
 })();

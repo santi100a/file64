@@ -18,13 +18,13 @@ add the proper header to use it as a URL for an image, whose format you can spec
 **Keep in mind NPM usage is coming soon.**
 
 # Flags and Operands
-Specify these flags:
+Specify the filename you want to encode, and (optionally) the output filename (by default, it is
+the standard output). You can also specify these flags:
 
 - ```-V, --version```: Output the version number.
 - ```-h, --help```: Display help for the command.
 
 ---
 
-- ```-f, --file <filename>```: Input file **(required).**
 - ```-p, --picture [format]```: Print out the encoded file, alongside a header for using it as a URL for
 an image. You can also specify a format (default is JPEG).
