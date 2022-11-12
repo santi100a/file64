@@ -40,19 +40,23 @@ async function read(filename, encoding) {
     }
     const base64 = Buffer.from(file).toString('base64');
     if (output) {
-        async function writeFile(filename, encoding) {
+        async function writeFile(filename, data, encoding) {
             try {
-                await node_fs_1.promises.writeFile(filename, encoding || 'utf8');
+                await node_fs_1.promises.writeFile(filename, data, encoding || 'utf8');
                 return null;
             }
             catch (err) {
                 return err;
             }
         }
-        const err = await writeFile(filename.concat('-base64'));
+        const err = await writeFile(output, base64);
         if (err) {
             console.log('\x1b[31m%s\x1b[0m', `✗ An error has ocurred while writing the file. ${error}.`);
             process.exit(1);
+        }
+        else {
+            console.log('\x1b[32m%s\x1b[0m', '✓ Successfully encoded '.concat(output, '.'));
+            process.exit(0);
         }
     }
     console.log('Encoded file is: %s', base64);
